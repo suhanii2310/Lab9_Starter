@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!-- <!DOCTYPE html>
 <html lang="en">
 
 <head>
@@ -105,4 +105,183 @@
   </script>
 </body>
 
+</html> -->
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Lab 9</title>
+
+    <!-- Insert your TrackJS script here -->
+    <!-- Example: <script src="https://cdn.trackjs.com/agent/v3/latest/t.js"></script>
+               <script> window.trackJs = new TrackJS({ token: 'your_token' }); </script> -->
+
+    <script src="https://cdn.trackjs.com/agent/v3/latest/t.js"></script>
+    <script>
+      window.TrackJS &&
+        TrackJS.install({
+          token: "c6573f4b83e54969a9ee7e11e6e506a1",
+          // for more configuration options, see https://docs.trackjs.com
+        });
+    </script>
+
+    <style>
+      button {
+        margin: 3px;
+      }
+
+      button:hover {
+        cursor: pointer;
+      }
+
+      #first-num,
+      #second-num {
+        width: 60px;
+      }
+
+      output {
+        border: 1px solid gray;
+        display: block;
+        height: 18px;
+        margin-top: 5px;
+        padding: 5px;
+        width: 240px;
+      }
+
+      main {
+        width: 800px;
+      }
+
+      #error-btns {
+        column-gap: 5px;
+        display: flex;
+        flex-wrap: wrap;
+        margin-top: 30px;
+        row-gap: 5px;
+      }
+
+      #error-btns > * {
+        padding: 8px 2px;
+        width: 160px;
+      }
+    </style>
+  </head>
+
+  <body>
+    <main>
+      <form>
+        <fieldset>
+          <legend>Error Calculator</legend>
+          <input name="first-num" id="first-num" />
+          <select name="operator" id="operator">
+            <option>+</option>
+            <option>-</option>
+            <option>*</option>
+            <option>/</option>
+          </select>
+          <input name="second-num" id="second-num" />
+          <button id="calculate">Calculate</button>
+          <br />
+          <output></output>
+        </fieldset>
+      </form>
+
+      <section id="error-btns">
+        <button>Console Log</button>
+        <button>Console Error</button>
+        <button>Console Count</button>
+        <button>Console Warn</button>
+        <button>Console Assert</button>
+        <button>Console Clear</button>
+        <button>Console Dir</button>
+        <button>Console dirxml</button>
+        <button>Console Group Start</button>
+        <button>Console Group End</button>
+        <button>Console Table</button>
+        <button>Start Timer</button>
+        <button>End Timer</button>
+        <button>Console Trace</button>
+        <button>Trigger a Global Error</button>
+      </section>
+    </main>
+
+    <script>
+      class CalculationError extends Error {
+        constructor(message) {
+          super(message);
+          this.name = "CalculationError";
+        }
+      }
+
+      const output = document.querySelector("output");
+
+      document.querySelector("form").addEventListener("submit", (e) => {
+        e.preventDefault();
+        const firstNum = document.querySelector("#first-num").value;
+        const secondNum = document.querySelector("#second-num").value;
+        const operator = document.querySelector("#operator").value;
+
+        try {
+          if (operator === "/" && secondNum === "0") {
+            throw new CalculationError("Division by zero is not allowed.");
+          }
+
+          const result = eval(`${firstNum} ${operator} ${secondNum}`);
+          output.innerHTML = result;
+        } catch (err) {
+          console.error("Caught error during calculation:", err);
+          output.innerHTML = "Error!";
+        } finally {
+          console.log("Calculation attempted.");
+        }
+      });
+
+      const errorBtns = Array.from(
+        document.querySelectorAll("#error-btns > button")
+      );
+
+      // Button functionality mapping
+      const btnFuncs = [
+        () => console.log("Log button clicked"),
+        () => console.error("This is an error!"),
+        () => console.count("Count label"),
+        () => console.warn("This is a warning!"),
+        () => console.assert(false, "Assertion failed!"),
+        () => console.clear(),
+        () => console.dir(document.body),
+        () => console.dirxml(document.body),
+        () => console.group("Group Start"),
+        () => console.groupEnd(),
+        () =>
+          console.table([
+            { a: 1, b: 2 },
+            { a: 3, b: 4 },
+          ]),
+        () => console.time("timer"),
+        () => console.timeEnd("timer"),
+        () => console.trace("Trace point"),
+        () => {
+          // Trigger a global error
+          undefinedFunctionCall(); // Will be caught by window.onerror
+        },
+      ];
+
+      errorBtns.forEach((btn, idx) => {
+        btn.addEventListener("click", btnFuncs[idx]);
+      });
+
+      // Global error handler
+      window.onerror = function (message, source, lineno, colno, error) {
+        console.log("Global error caught:");
+        console.log("Message:", message);
+        console.log("Source:", source);
+        console.log("Line:", lineno, "Col:", colno);
+        console.log("Error obj:", error);
+        return true;
+      };
+    </script>
+  </body>
 </html>
